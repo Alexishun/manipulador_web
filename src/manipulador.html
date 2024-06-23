@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang='es'>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Inventariado de Almacén</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="scripts.js" defer></script>
+</head>
+
+<body>
+  <div class='container'>
+    <div class='header'>
+      <h1>Inventariado Almacén</h1>
+    </div>
+    <div class='section webcam'>
+      <h2>Webcam</h2>
+    </div>
+    <div class='section almacen'>
+      <div>
+        <label for='almacen-a'>Almacén A - Cantidad:</label>
+        <input type='number' id='almacen-a' name='cantA' value='0'>
+      </div>
+      <div>
+        <label for='almacen-b'>Almacén B - Cantidad:</label>
+        <input type='number' id='almacen-b' name='cantB' value='0'>
+      </div>
+    </div>
+    <div class='section movimientos'>
+      <h2>Movimientos</h2>
+      <label for='mov1'>Q1:</label>
+      <input type='text' id='mov1' name='angQ1'>
+      <label for='mov2'>Q2:</label>
+      <input type='text' id='mov2' name='angQ2'>
+      <label for='mov3'>Q3:</label>
+      <input type='text' id='mov3' name='angQ3'>
+      <label for='mov4'>Q4:</label>
+      <input type='text' id='mov4' name='angQ4'>
+      <button class='go-button' type='button' onclick='sendData()'>Go</button>
+    </div>
+    <div class='section rutina'>
+      <h2>Rutina</h2>
+      <button id='rutina-a' name='RutA' onclick='updateAlmacen("A")'>A</button>
+      <button id='rutina-b' name='RutB' onclick='updateAlmacen("B")'>B</button>
+    </div>
+    <div class='footer'>
+      UNI Grupo 8 - MT136-B
+    </div>
+  </div>
+</body>
+
+</html>
