@@ -4,7 +4,7 @@ function sendData() {
     var angQ3 = document.getElementById('mov3').value;
     var angQ4 = document.getElementById('mov4').value;
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/update', true);
+    xhr.open('POST', '/api/update', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.send('angQ1=' + angQ1 + '&angQ2=' + angQ2 + '&angQ3=' + angQ3 + '&angQ4=' + angQ4);
     xhr.onload = function () {
