@@ -13,3 +13,4 @@ themes/classic/views/
 .vscode/ipch
 >>>>>>> origin/master
 .vercel
+node_modules

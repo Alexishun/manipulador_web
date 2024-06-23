@@ -1,38 +1,46 @@
 #include <WiFi.h>
-#include <HTTPClient.h>
+#include <FirebaseESP32.h>
 
+// Configuración de WiFi
 const char* ssid = "WIN UNI";
 const char* password = "0123456789";
-const char* serverName = "https://manipulatorweb.vercel.app/api/sensordata"; // Asegúrate de usar la URL correcta
+
+// Configuración de Firebase
+#define FIREBASE_HOST "manipuladorweb-c1b90-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "U0UNLBmYWQQDvqQRuOyYsnrzKB5KaMNxqtQTqmG6"
+
+FirebaseData firebaseData;
+FirebaseAuth auth;
+FirebaseConfig config;
 
 void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, password);
-  Serial.println("Connecting ");
+  Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("");
-  Serial.print("Conectado a la red con la IP: ");
+  Serial.println();
+  Serial.print("Connected to WiFi. IP address: ");
   Serial.println(WiFi.localIP());
+
+  config.host = FIREBASE_HOST;
+  config.signer.tokens.legacy_token = FIREBASE_AUTH;
+  Firebase.begin(&config, &auth);
+  Firebase.reconnectWiFi(true);
 }
 
 void loop() {
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(serverName);
-    int httpResponseCode = http.GET();
-
-    if (httpResponseCode > 0) {
-      String payload = http.getString();
-      Serial.println(httpResponseCode);
-      Serial.println(payload);
-    } else {
-      Serial.print("Error code: ");
-      Serial.println(httpResponseCode);
+  if (Firebase.getInt(firebaseData, "/sensorData/angQ1")) {
+    if (firebaseData.dataType() == "int") {
+      int angQ1 = firebaseData.intData();
+      Serial.print("angQ1: ");
+      Serial.println(angQ1);
     }
-    http.end();
+  } else {
+    Serial.println("Failed to get data: " + firebaseData.errorReason());
   }
-  delay(7000);
+
+  delay(5000); // Obtener datos cada 5 segundos
 }
