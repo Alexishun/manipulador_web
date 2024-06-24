@@ -33,9 +33,9 @@ void setup() {
 
 void loop() {
   if (Firebase.get(firebaseData, "/sensorData/angQ1")) {
-    if (firebaseData.dataType() == "string") {
+    if (firebaseData.dataType() == "int") {
       int angQ1;
-      angQ1 = firebaseData.stringData().toInt();
+      angQ1 = firebaseData.intData();
       Serial.print("angQ1: ");
       Serial.println(angQ1);
     }

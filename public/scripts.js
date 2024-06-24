@@ -47,7 +47,6 @@ function updateAlmacen(almacen) {
     cantB += 1;
     document.getElementById('almacen-b').value = cantB;
   }
-
   // Actualizar datos en Firebase
   database.ref('almacen').set({
     almacen: almacen,
@@ -61,16 +60,53 @@ function updateAlmacen(almacen) {
 }
 
 // Función para capturar imagen (si es necesario)
-function captureImage(resolution) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', resolution, true);
-  xhr.send();
-  xhr.onload = function () {
-    if (xhr.status == 200) {
-      console.log('Image captured: ' + xhr.responseText);
-      // Si necesitas guardar datos de la imagen en Firebase, agrega el código aquí.
-    }
-  }
+function captureImage() {
+  // Dibuja el video en el canvas
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+  // Convierte el contenido del canvas a una URL de datos
+  var dataURL = canvas.toDataURL('image/png');
+
+  // Sube la imagen a Firebase Storage
+  var storageRef = storage.ref();
+  var imageRef = storageRef.child('images/captured_image.png');
+
+  imageRef.putString(dataURL, 'data_url').then((snapshot) => {
+    console.log('Imagen subida a Firebase Storage');
+    
+    // Obtiene la URL de descarga de la imagen
+    snapshot.ref.getDownloadURL().then((url) => {
+      // Actualiza la imagen en la sección de la webcam
+      webcamImage.src = url;
+      console.log('URL de la imagen: ', url);
+      
+      // Realiza el reconocimiento de texto usando Tesseract.js
+      const rec = new Tesseract.TesseractWorker();
+      rec.recognize(url)
+        .progress(function (response) {
+          if(response.status == 'recognizing text'){
+            progress.innerHTML = response.status + ' ' + response.progress;
+          } else {
+            progress.innerHTML = response.status;
+          }
+        })
+        .then(function (data) {
+          textarea.innerHTML = data.text;
+          progress.innerHTML = 'Done';
+          
+          // Enviar el texto reconocido a Firebase Database
+          database.ref('recognizedText').set({
+            text: data.text
+          }).then(function() {
+            console.log('Texto reconocido enviado a Firebase');
+          }).catch(function(error) {
+            console.log('Error al enviar el texto reconocido: ' + error);
+          });
+        });
+    });
+  }).catch((error) => {
+    console.error('Error al subir la imagen: ', error);
+  });
 }
 
 // Escuchar cambios en los datos de sensorData
