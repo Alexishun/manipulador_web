@@ -13,6 +13,20 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 
+// Función para configurar el modo
+function setControlMode(mode) {
+  document.getElementById('process-status').innerText = `Modo de control: ${mode}`;
+  var controlado = mode === "automatic" ? true : false;
+
+  database.ref('Modo').set({
+    controlado: controlado
+  }).then(function() {
+    console.log('Valores enviados');
+  }).catch(function(error) {
+    console.log('Error en el envío: ' + error);
+  });
+}
+
 // Función para enviar datos a Firebase
 function sendData() {
   var angQ1 = parseInt(document.getElementById('mov1').value);
@@ -33,24 +47,17 @@ function sendData() {
   });
 }
 
-/// Función para actualizar datos de almacén en Firebase
 function updateAlmacen(almacen) {
-  // Obtener las cantidades de las cajas desde los inputs
-  var cantA = parseInt(document.getElementById('almacen-a').value, 10);
-  var cantB = parseInt(document.getElementById('almacen-b').value, 10);
+  var cantA = parseInt(document.getElementById('almacen-a').value);
+  var cantB = parseInt(document.getElementById('almacen-b').value);
 
-  // Incrementar la cantidad de cajas dependiendo del almacén seleccionado
   if (almacen === "A") {
     cantA += 1;
-    document.getElementById('almacen-a').value = cantA;
   } else if (almacen === "B") {
     cantB += 1;
-    document.getElementById('almacen-b').value = cantB;
   }
-
-  // Actualizar datos en Firebase
   database.ref('almacen').set({
-    almacen: almacen,
+    almacen_rutina: almacen,
     cantA: cantA,
     cantB: cantB
   }).then(function() {
@@ -60,17 +67,57 @@ function updateAlmacen(almacen) {
   });
 }
 
-// Función para capturar imagen (si es necesario)
-function captureImage(resolution) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', resolution, true);
-  xhr.send();
-  xhr.onload = function () {
-    if (xhr.status == 200) {
-      console.log('Image captured: ' + xhr.responseText);
-      // Si necesitas guardar datos de la imagen en Firebase, agrega el código aquí.
-    }
+fileSelector.onchange = () => {
+  var file = fileSelector.files[0]
+  var imgUrl = window.URL.createObjectURL(new Blob([file], { type: 'image/jpg' }))
+  console.log(imgUrl);
+  img.src = imgUrl
+}
+
+function captureImage() {
+  var file = document.getElementById('fileSelector').files[0];
+  if (file) {
+    var imgUrl = URL.createObjectURL(file);
+    document.getElementById('captured-img').src = imgUrl;
+
+    // Actualizar la base de datos
+    database.ref('procesamiento').set({
+      capturar_img: true,
+      img: imgUrl,
+      text_rec: ''
+    }).then(function() {
+      console.log('Imagen capturada y guardada en la base de datos');
+      // Iniciar reconocimiento de texto
+      startTextRecognition(file);
+    }).catch(function(error) {
+      console.log('Error al guardar la imagen: ' + error);
+    });
   }
+}
+
+function startTextRecognition(file) {
+  const rec = new Tesseract.TesseractWorker();
+  rec.recognize(file)
+    .progress(function(response) {
+      if (response.status == 'recognizing text') {
+        document.getElementById('progress').innerHTML = response.status + ' ' + response.progress;
+      } else {
+        document.getElementById('progress').innerHTML = response.status;
+      }
+    })
+    .then(function(data) {
+      document.getElementById('textarea').innerHTML = data.text;
+      document.getElementById('progress').innerHTML = 'Done';
+
+      // Actualizar la base de datos con el texto reconocido
+      database.ref('procesamiento').update({
+        text_rec: data.text
+      }).then(function() {
+        console.log('Texto reconocido guardado en la base de datos');
+      }).catch(function(error) {
+        console.log('Error al guardar el texto reconocido: ' + error);
+      });
+    });
 }
 
 // Escuchar cambios en los datos de sensorData
@@ -85,8 +132,23 @@ database.ref('sensorData').on('value', (snapshot) => {
   }
 });
 
-// Escuchar cambios en los datos de almacen
 database.ref('almacen').on('value', (snapshot) => {
   const data = snapshot.val();
-  console.log('Datos de almacén actualizados: ', data);
+  if (data) {
+    document.getElementById('almacen-a').value = data.cantA;
+    document.getElementById('almacen-b').value = data.cantB;
+    console.log('Datos actualizados: ', data);
+  }
+});
+
+database.ref('Modo').on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    var value = data.controlado;
+    if (value) {
+      document.getElementById('process-status').innerText = `Modo de control: Automático`;
+    } else {
+      document.getElementById('process-status').innerText = `Modo de control: Manual`;
+    }
+  }
 });
