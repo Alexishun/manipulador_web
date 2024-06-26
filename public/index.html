@@ -9,11 +9,11 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GCFCN7G09K"></script>
   <script defer src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/8.6.1/firebase-database.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
+  <script defer src="https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.js"></script>
   <script defer src="scripts.js"></script>
   <script>
     // Your web app's Firebase configuration
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
     const firebaseConfig = {
       apiKey: "AIzaSyBdz1y5nBA0drg_ZyxwozQoaJOOz2QmWxs",
       authDomain: "manipuladorweb-c1b90.firebaseapp.com",
@@ -27,7 +27,6 @@ import { getAnalytics } from "firebase/analytics";
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
   </script>
 </head>
 <body>
@@ -47,9 +46,16 @@ import { getAnalytics } from "firebase/analytics";
     </div>
     <div class='section webcam'>
       <h2>Webcam</h2>
+<<<<<<< HEAD
       <input type="file" id="fileSelector" accept="image/*">
       <button id='button' name='foto' onclick='captureImage()'>Capturar imagen</button>
       <img src="">
+=======
+      <button id='snap' type='button' onclick='captureImage()'>Capturar imagen</button>
+      <div>
+        <img src="">
+      </div>
+>>>>>>> 262af9e9ce509d5648b06d860950eb824d29fe28
     </div>
     <div class='section almacen'>
       <div>

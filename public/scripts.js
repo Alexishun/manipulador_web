@@ -23,7 +23,7 @@ function setControlMode(mode) {
   }).then(function() {
     console.log('Valores enviados');
   }).catch(function(error) {
-    console.log('Error en el envío: ' + error);
+    console.log('Error en el envío: ' +   error);
   });
 }
 
