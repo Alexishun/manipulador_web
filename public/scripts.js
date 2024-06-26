@@ -13,19 +13,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 
-// Función para configurar el modo
-function setControlMode(mode) {
-  document.getElementById('process-status').innerText = `Modo de control: ${mode}`;
-  var controlado = mode === "automatic" ? true : false;
-
-  database.ref('Modo').set({
-    controlado: controlado
-  }).then(function() {
-    console.log('Valores enviados');
-  }).catch(function(error) {
-    console.log('Error en el envío: ' +   error);
-  });
-}
 
 // Función para enviar datos a Firebase
 function sendData() {
