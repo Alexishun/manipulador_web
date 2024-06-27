@@ -13,20 +13,36 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 
+// Función para configurar el modo
+function setControlMode(mode) {
+  document.getElementById('process-status').innerText = `Modo de control: ${mode}`;
+  var controlado = mode === "automatic" ? true : false;
+
+  database.ref('Modo').set({
+    controlado: controlado
+  }).then(function() {
+    console.log('Valores enviados');
+  }).catch(function(error) {
+    console.log('Error en el envío: ' + error);
+  });
+}
 
 // Función para enviar datos a Firebase
 function sendData() {
+  document.getElementById('process-status').innerText = `Movimiento manual`;
   var angQ1 = parseInt(document.getElementById('mov1').value);
   var angQ2 = parseInt(document.getElementById('mov2').value);
   var angQ3 = parseInt(document.getElementById('mov3').value);
   var angQ4 = parseInt(document.getElementById('mov4').value);
+  var angQ5 = parseInt(document.getElementById('mov5').value);
 
   // Enviar datos a Firebase como enteros
   database.ref('sensorData').set({
     angQ1: angQ1,
     angQ2: angQ2,
     angQ3: angQ3,
-    angQ4: angQ4
+    angQ4: angQ4,
+    angQ5: angQ5
   }).then(function() {
     console.log('Valores enviados');
   }).catch(function(error) {
@@ -35,6 +51,7 @@ function sendData() {
 }
 
 function updateAlmacen(almacen) {
+  document.getElementById('process-status').innerText = `Enviando caja ${almacen}`;
   var cantA = parseInt(document.getElementById('almacen-a').value);
   var cantB = parseInt(document.getElementById('almacen-b').value);
 
